@@ -2,7 +2,9 @@
 #include <stdio.h>  //streams
 #include <stdlib.h> //malloc and friends
 #include <unistd.h> //POSIX API wrappers (Are they using it? mmmm no...)
+
 #include "mitar.h"
+#include "utils.h"
 
 extern char *uso;
 
@@ -19,11 +21,10 @@ int copynFile(FILE *origen, FILE *destimo, int nBytes);
  * Reads the header of the specified tar file
  * @param [in]  tarFile Handler of the tar file (Technically is IN/OUT because the state stored at FILE struct is modified by the read ops, but from the user
  *                      point of view is IN)
- * @param [out] header Pointer to the header of the tar 
  * @param [out] nFiles Number of files contained in the tar
- * @return EXIT_SUCCESS if the header was successfully readed. EXIT_FAILURE in other case.
+ * @return The memory location of the header if it was readed successfully. NULL in other case.
  */
-int readHeader(FILE *tarFile, stHeaderEntry **header, int *nFiles);
+stHeaderEntry* readHeader(FILE *tarFile, int *nFiles);
 
 
 int createTar(int nFiles, char *fileNames[], char tarName[]) {
@@ -59,6 +60,10 @@ int createTar(int nFiles, char *fileNames[], char tarName[]) {
   
   //Relleno la cabecera en RAM y copio los datos de los ficheros en el tar
   for(i=0; i<nFiles; i++) {
+	
+	/* PARTE OPCIONAL 1 AQUI!!!!!!!!! */
+	remove_slash(fileNames + i);
+	
     //Abrimos fichero fuente
     if((inputFile=fopen(fileNames[i], "r"))==NULL) {
       fprintf(stderr, "No se ha podido abrir el fichero tar %s: \n", fileNames[i]);
@@ -69,7 +74,7 @@ int createTar(int nFiles, char *fileNames[], char tarName[]) {
       return(EXIT_FAILURE);
     }
     //Rellenamos la cabecera
-    strcpy(header[i].name, fileNames[i]);
+    strcpy(header[i].name, fileNames[i]); //OK
 
     //Copiamos el fichero
     header[i].size=copynFile(inputFile,tarFile,INT_MAX);
@@ -79,7 +84,7 @@ int createTar(int nFiles, char *fileNames[], char tarName[]) {
   //Escribimos el n�mero de ficheros junto a la cabecera
   rewind(tarFile);
   fwrite(&nFiles,sizeof(int), 1,  tarFile);
-  fwrite(header,sizeof(stHeaderEntry), nFiles,  tarFile);
+  //fwrite(header,sizeof(stHeaderEntry), nFiles,  tarFile); <--- no lo uso
     
   fprintf(stdout, "Fichero mitar creado con exito\n");
 
@@ -150,8 +155,10 @@ int copynFile(FILE *origen, FILE *destimo, int nBytes){
   return(nCopy);
 }
 
-int readHeader(FILE *tarFile, stHeaderEntry **header, int *nFiles){
-
+stHeaderEntry* readHeader(FILE *tarFile, int *nFiles){
+	stHeaderEntry* header;
+	int i;
+	
   //Numero de ficheros
   fread(nFiles,sizeof(int), 1, tarFile);
   
@@ -159,11 +166,33 @@ int readHeader(FILE *tarFile, stHeaderEntry **header, int *nFiles){
   if((*header=(stHeaderEntry *)malloc(sizeof(stHeaderEntry)*(*nFiles)))==NULL) {
     perror("Error al reservar memoria para la cabecera del fichero mtar");
     fclose(tarFile);
-    return(EXIT_FAILURE);
+    return(NULL);
   }
-  
-  //Leemos la cabecera
-  fread(*header,sizeof(stHeaderEntry), *nFiles,  tarFile);
 
-  return(EXIT_SUCCESS);
+	for(i = 0 ; i < *nFiles ; ++i)
+	{
+		/* header layout at tar file:
+	
+		+---------------------------------------------+
+		|  name_length |  name char array | file_size |
+		+---------------------------------------------+
+		                  ^^^^^^^^^^^^^^^
+	 				 		  with \0
+			               
+
+		*/
+
+		fread(&(header[i].name_length) , sizeof(size_t)       , 1 , file);
+
+		if(!(header[i].name = (char*)malloc(sizeof(char) * header[i].name_length)))
+			perror("Error al reservar memoria para el nombre de la cabecera");
+			fclose(tarFile);
+			return(NULL);
+	  	}
+
+		fread(&(header[i].name)        , sizeof(char)         , name_header[i].name_length , file);
+		fread(&(header[i].file_size)   , sizeof(size_t)       , 1 , file);
+	}
+
+  return header;
 }

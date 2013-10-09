@@ -11,9 +11,10 @@ typedef enum{
 } flags;
 
 typedef struct {
-  char name[PATH_MAX];
-  unsigned int size;
-} stHeaderEntry;
+    char* name;
+    size_t name_length;
+    size_t file_size;
+}   stHeaderEntry;
 
 
 /*

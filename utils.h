@@ -8,11 +8,6 @@
 #ifndef UTILS_H
 #define	UTILS_H
 
-#ifndef byte
-#include <stdint.h>
-typedef uint8_t byte;
-#endif /* byte */
-
 /**
  * Copies the data from one range to the specified location
  * 
@@ -22,17 +17,34 @@ typedef uint8_t byte;
  * @param last Pointer pointing to the end of the source range
  * @param d_first Pointer pointing to the begin of the destination range.
  */
-void copy(void* first , void* last , void* d_first)
-{
-    byte*  ptr   = (byte*)first;
-    byte* d_ptr  = (byte*)d_first;
-    byte* last_b = (byte*)last;
-    
-    while(ptr != last_b)
-    {
-        *d_ptr++ = *ptr++;
-    }
-}
+void copy(void* first , void* last , void* d_first);
+
+/**
+* Copies the specified string into a new dynamically-allocated string.
+* 
+* @param string A pointer to a c-style string.
+* 
+* @returns A pointer to the cloned string. NULL if an error ocurred during the allocation.
+*/
+char* clone_str(char* string);
+
+/**
+* Removes the beggining slash of a file.
+*
+* @param string [in] Pointer (Reference) to the string
+*/
+void remove_slash(char** string);
+
+
+/**
+* Reads the next header form the specified tar file.
+*
+* @param file handler of the tar file.
+*
+* @return Returns the location of the header if it was readed successfully. Returns NULL otherwise.
+*/
+stHeader* read_header(FILE* file);
+
 
 #endif	/* UTILS_H */
 
