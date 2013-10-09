@@ -27,9 +27,40 @@ int copynFile(FILE *origen, FILE *destimo, int nBytes);
 stHeaderEntry* readHeader(FILE *tarFile, int *nFiles);
 
 
+/****************************************************************************************************************************************************
+*  TAR FILE LAYOUT:                                                                                                                                 *
+*  ===============                                                                                                                                  *
+*                                                                                                                                                   *
+*                                                                                                                                                   *
+*       sizeof(int)     header1 size                                                        headern_size                                            *
+*   <---------------> <-------------> <------------------------ ... --------------------> <------------->                                           *
+*                                                                                                                                                   *
+*  +-----------------+---------------+---------------------------------------------------+---------------+----------------+-----+----------------+  *
+*  | number_of_files | file_1_header |                          ...                      | file_n_header | file_1_content | ... | file_n_content |  *
+*  +-----------------+---------------+---------------------------------------------------+---------------+----------------+-----+----------------+  *
+*                                                                                                                                                   *
+*                     <--------------------------------------------------------------------------------->                                           *
+*                        Σ( sizeof(size_t) + sizeof(size_t) + (sizeof(char) * header[n].name_langth) )                                              *
+*                                                                                                                                                   *
+*                                                                                                                                                   *
+*  FILE HEADER LAYOUT:                                                                                                                              *
+*  ==================                                                                                                                               *
+*                                                                                                                                                   *
+*                                                                                                                                                   *
+*     sizeof(size_t)     sizeof(char) * name_length     sizeof(size_t)                                                                              *
+*  <-----------------> <----------------------------> <---------------->                                                                            *
+*                                                                                                                                                   *
+* +-------------------+------------------------------+------------------+                                                                           *
+* |    name_length    |         file_name            |     file_size    |                                                                           *
+* +-------------------+------------------------------+------------------+                                                                           *
+*                                                                                                                                                   *
+****************************************************************************************************************************************************/
+
+
 int createTar(int nFiles, char *fileNames[], char tarName[]) {
   
   int i;
+	size_t header_offset;
   FILE *tarFile, *inputFile;
   stHeaderEntry *header;
   
@@ -53,16 +84,23 @@ int createTar(int nFiles, char *fileNames[], char tarName[]) {
     remove(tarName);
     return(EXIT_FAILURE);
   }
+
+	header_offset = sizeof(int); //number_of_files offset (See ascii-art above)
+
+	for( i = 0 ; i < nFiles ; ++i )
+	{
+		header_offset += sizeof(size_t) + ( siezof(char) * ( strlen(fileNames[i]) + 1 ) ) + sizeof(size_t); //See file header layout above.
+	}
   
   //Nos posicionamos enla zona de datos del fichero mtar
-  fseek(tarFile, sizeof(int)+sizeof(stHeaderEntry)*nFiles, SEEK_SET);
+  fseek(tarFile, header_offset , SEEK_SET);
   
   
   //Relleno la cabecera en RAM y copio los datos de los ficheros en el tar
   for(i=0; i<nFiles; i++) {
 	
 	/* PARTE OPCIONAL 1 AQUI!!!!!!!!! */
-	remove_slash(fileNames + i);
+	remove_slash(fileNames[i]);
 	
     //Abrimos fichero fuente
     if((inputFile=fopen(fileNames[i], "r"))==NULL) {
@@ -74,17 +112,19 @@ int createTar(int nFiles, char *fileNames[], char tarName[]) {
       return(EXIT_FAILURE);
     }
     //Rellenamos la cabecera
-    strcpy(header[i].name, fileNames[i]); //OK
+    header[i].name        = clone_str( fileNames[i] );
+	header[i].name_length = strlen( fileNames[i] ) + 1;
 
     //Copiamos el fichero
-    header[i].size=copynFile(inputFile,tarFile,INT_MAX);
+    header[i].file_size = copynFile(inputFile,tarFile,INT_MAX);
     fclose(inputFile);
   }
 
   //Escribimos el n�mero de ficheros junto a la cabecera
   rewind(tarFile);
   fwrite(&nFiles,sizeof(int), 1,  tarFile);
-  //fwrite(header,sizeof(stHeaderEntry), nFiles,  tarFile); <--- no lo uso
+  
+	write_tar_header( tarFile , header , nFiles );
     
   fprintf(stdout, "Fichero mitar creado con exito\n");
 
@@ -107,7 +147,7 @@ int extractTar(char tarName[]) {
   }
   
   //Leemos la cabecera del mtar
-  if(readHeader(tarFile, &header, &nFiles)==EXIT_FAILURE){
+  if(!(header = read_tar_header( tarFile, header, &nFiles))){
     fclose(tarFile);
     return(EXIT_FAILURE);
   }
@@ -125,7 +165,7 @@ int extractTar(char tarName[]) {
     printf("[%i]: Creando fichero %s, tama�o %i Bytes...", i, header[i].name, header[i].size);
     
     //Copiamos el fichero
-    if(copynFile(tarFile,outputFile,header[i].size)!=header[i].size){
+    if(copynFile(tarFile,outputFile,header[i].file_size)!=header[i].file_size){
       fprintf(stderr, "No se ha podido copiar el fichero %s: \n", header[i].name);
       free(header);
       fclose(tarFile);
@@ -155,7 +195,33 @@ int copynFile(FILE *origen, FILE *destimo, int nBytes){
   return(nCopy);
 }
 
-stHeaderEntry* readHeader(FILE *tarFile, int *nFiles){
+
+void write_tar_header(FILE* file , stHeaderEntry* headers , int n_files)
+{
+	int i = 0;
+
+	for( i = 0 ; i < n_files ; ++i )
+	{
+		/* header layout at tar file:
+	
+		+---------------------------------------------+
+		|  name_length |  name char array | file_size |
+		+---------------------------------------------+
+		                  ^^^^^^^^^^^^^^^
+	 					      with \0
+			               
+
+		*/
+
+		fwrite( &(headers[i].name_length) , sizeof(size_t) , 1                      , file );
+		fwrite(   headers[i].name         , sizeof(char)   , headers[i].name_length , file );
+		fwrite( &(headers[i].file_size)   , sizeof(size_t) , 1                      , file );
+
+		free(headers[i].name); //No lo vuelvo a usar y me parecía un sitio cómodo para liberarla
+	}
+}
+
+stHeaderEntry* read_tar_header(FILE *tarFile, int *nFiles){
 	stHeaderEntry* header;
 	int i;
 	
@@ -177,7 +243,7 @@ stHeaderEntry* readHeader(FILE *tarFile, int *nFiles){
 		|  name_length |  name char array | file_size |
 		+---------------------------------------------+
 		                  ^^^^^^^^^^^^^^^
-	 				 		  with \0
+	 						  with \0
 			               
 
 		*/

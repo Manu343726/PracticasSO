@@ -33,7 +33,7 @@ char* clone_str(char* string);
 *
 * @param string [in] Pointer (Reference) to the string
 */
-void remove_slash(char** string);
+void remove_slash(char* string);
 
 
 /**
