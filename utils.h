@@ -5,6 +5,10 @@
  * Created on 6 de octubre de 2013, 22:26
  */
 
+#include <stdio.h>
+
+#include "mitar.h"
+
 #ifndef UTILS_H
 #define	UTILS_H
 
@@ -29,9 +33,9 @@ void copy(void* first , void* last , void* d_first);
 char* clone_str(char* string);
 
 /**
-* Removes the beggining slash of a file.
+* Removes the beggining slash of a file name.
 *
-* @param string [in] Pointer (Reference) to the string
+* @param string [in] Pointer (Reference) to the string which contains the file name.
 */
 void remove_slash(char* string);
 
@@ -43,7 +47,7 @@ void remove_slash(char* string);
 *
 * @return Returns the location of the header if it was readed successfully. Returns NULL otherwise.
 */
-stHeader* read_header(FILE* file);
+stHeaderEntry* read_header(FILE* file);
 
 
 #endif	/* UTILS_H */
