@@ -82,3 +82,20 @@ void write_header(FILE* file, stHeaderEntry* header) {
     fwrite(header->name, sizeof (char), header->name_length, file);
     fwrite(&(header->file_size), sizeof (size_t), 1, file);
 }
+
+void free_header(stHeaderEntry* tar_header , int nFiles)
+{
+    free_header_range(tar_header , 0 , (size_t)nFiles);
+}
+
+void free_header_range(stHeaderEntry* tar_header , size_t begin , size_t end)
+{
+    size_t i;
+    
+    for( i = begin ; i != end ; ++i )
+    {
+        free(tar_header[i].name);
+    }
+    
+    free(tar_header);
+}

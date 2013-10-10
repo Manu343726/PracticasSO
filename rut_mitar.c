@@ -62,10 +62,12 @@ void write_tar_header(FILE* file , stHeaderEntry* headers , int n_files);
  * |    name_length    |         file_name            |     file_size    |                                                                           *
  * +-------------------+------------------------------+------------------+                                                                           *
  *                                                                                                                                                   *
+ * NOTE: file_name includes \0 (name_langth is the length of the array, not the length of the string).                                               *                                           *
+ *                                                                                                                                                   *
  ****************************************************************************************************************************************************/
 
 
-int createTar(int nFiles, char *fileNames[], char tarName[]) {
+int createTar(int nFiles, char *fileNames[], char tarName[]) {//LEAK_FREE
     int i;
     size_t header_offset;
     FILE *tarFile, *inputFile;
@@ -78,7 +80,7 @@ int createTar(int nFiles, char *fileNames[], char tarName[]) {
     }
 
     //Abrimos el fichero destino
-    if (!(tarFile = fopen(tarName, "wx"))) {
+    if (!(tarFile = fopen(tarName, "w"))) { //He cambiado el modo de apertura para no tener que borrar el archivo cada vez que ejecuto
         fprintf(stderr, "No se ha podido abrir el fichero tar %s: \n", tarName);
         perror(NULL);
         return (EXIT_FAILURE);
@@ -112,7 +114,7 @@ int createTar(int nFiles, char *fileNames[], char tarName[]) {
         if ((inputFile = fopen(fileNames[i], "r")) == NULL) {
             fprintf(stderr, "No se ha podido abrir el fichero tar %s: \n", fileNames[i]);
             perror(NULL);
-            free(header);
+            free_header_range(header , 0 , i); //Avoid strings and header leaks (See documentation details).
             fclose(tarFile);
             remove(tarName);
             return (EXIT_FAILURE);
@@ -135,13 +137,13 @@ int createTar(int nFiles, char *fileNames[], char tarName[]) {
 
     fprintf(stdout, "Fichero mitar creado con exito\n");
 
-    free(header);
+    free_header(header , nFiles); //Avoid strings and header leaks (See documentation details).
     fclose(tarFile);
 
     return (EXIT_SUCCESS);
 }
 
-int extractTar(char tarName[]) {
+int extractTar(char tarName[]) {//LEAK_FREE
     stHeaderEntry *header;
     int nFiles, i;
     FILE *tarFile, *outputFile;
@@ -155,16 +157,17 @@ int extractTar(char tarName[]) {
 
     //Leemos la cabecera del mtar
     if (!(header = read_tar_header(tarFile, &nFiles))) {
+        //Leaking is managed by read_tar_header().
         fclose(tarFile);
         return (EXIT_FAILURE);
     }
 
     //Creamos los ficheros contenidos en el mtar
     for (i = 0; i < nFiles; i++) {
-        if ((outputFile = fopen(header[i].name, "wx")) == NULL) {
+        if ((outputFile = fopen(header[i].name, "w")) == NULL) {//He cambiado el modo de apertura para no tener que borrar el archivo cada vez que ejecuto
             fprintf(stderr, "No se ha podido crear el fichero %s: \n", header[i].name);
             perror(NULL);
-            free(header);
+            free_header(header , nFiles); //Avoid strings and header leaks (See documentation details).
             fclose(tarFile);
             return (EXIT_FAILURE);
         }
@@ -174,7 +177,7 @@ int extractTar(char tarName[]) {
         //Copiamos el fichero
         if (copynFile(tarFile, outputFile, header[i].file_size) != header[i].file_size) {
             fprintf(stderr, "No se ha podido copiar el fichero %s: \n", header[i].name);
-            free(header);
+            free_header(header , nFiles); //Avoid strings and header leaks (See documentation details).
             fclose(tarFile);
             fclose(outputFile);
             remove(header[i].name);
@@ -186,7 +189,7 @@ int extractTar(char tarName[]) {
 
     }
 
-    free(header);
+    free_header(header , nFiles); //Avoid strings and header leaks (See documentation details).
     fclose(tarFile);
     return (EXIT_SUCCESS);
 }
@@ -201,7 +204,7 @@ int copynFile(FILE *origen, FILE *destimo, int nBytes) {
     return (nCopy);
 }
 
-void write_tar_header(FILE* file, stHeaderEntry* headers, int n_files) {
+void write_tar_header(FILE* file, stHeaderEntry* headers, int n_files) { //LEAK_FREE (Caller ownership)
     int i = 0;
 
     for (i = 0; i < n_files; ++i) {
@@ -211,7 +214,7 @@ void write_tar_header(FILE* file, stHeaderEntry* headers, int n_files) {
         |  name_length |  name char array | file_size |
         +---------------------------------------------+
                           ^^^^^^^^^^^^^^^
-                                              with \0
+                              with \0
 			               
 
          */
@@ -219,12 +222,10 @@ void write_tar_header(FILE* file, stHeaderEntry* headers, int n_files) {
         fwrite(&(headers[i].name_length), sizeof (size_t), 1, file);
         fwrite(headers[i].name, sizeof (char), headers[i].name_length, file);
         fwrite(&(headers[i].file_size), sizeof (size_t), 1, file);
-
-        free(headers[i].name); //No lo vuelvo a usar y me parecía un sitio cómodo para liberarlo
     }
 }
 
-stHeaderEntry* read_tar_header(FILE *tarFile, int *nFiles) {
+stHeaderEntry* read_tar_header(FILE *tarFile, int *nFiles) { //LEAK_FREE
     stHeaderEntry* header;
     int i;
 
@@ -245,7 +246,7 @@ stHeaderEntry* read_tar_header(FILE *tarFile, int *nFiles) {
         |  name_length |  name char array | file_size |
         +---------------------------------------------+
                           ^^^^^^^^^^^^^^^
-                                                  with \0
+                              with \0
 
 
          */
@@ -254,6 +255,7 @@ stHeaderEntry* read_tar_header(FILE *tarFile, int *nFiles) {
 
         if (!(header[i].name = (char*) malloc(sizeof (char) * header[i].name_length))){
             perror("Error al reservar memoria para el nombre de la cabecera");
+            free_header_range(header , 0 , i); //Avoid strings and header leaks (See documentation details)
             fclose(tarFile);
             return (NULL);
         }

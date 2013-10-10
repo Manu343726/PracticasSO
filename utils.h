@@ -49,6 +49,29 @@ void remove_slash(char* string);
 */
 stHeaderEntry* read_header(FILE* file);
 
+/**
+ * Frees the memory used by a tar file header.
+ * @param tar_header Pointer to the tar file header (dynamic-array of file headers). 
+ * @param nFiles Number of files of the tar file.
+ */
+void free_header(stHeaderEntry* tar_header , int nFiles);
+
+/**
+ * Frees the memory used by the range [begin,end) of tar file header entries.
+ * 
+ * @details This function is dessigned to avoid memory-leaks in the execution of the "read_tar_header()" function and others.
+ *          In that functions, first a chunk of memory is reserved to allocate the set of file headers, and later that set of 
+ *          headers is trasversed to write the appropiate data. That writting includes a memory allocation for each file name
+ *          (Calls to "clone_str()", and explicit malloc calls before fread(header[i].name)). 
+ *          If that trasverse fails, we need to deallocate the set of strings we allocated previously, and the complete chunk
+ *          of memory which holds the set of headers.
+ * 
+ * @param tar_header Pointer to the dynamically-allocated set of file headers (Tar file header).
+ * @param begin Index of the first header entry to be freed. 
+ * @param end Index of the end of the range (Note tha range specified [begin,end) is not end-inclusive).
+ */
+void free_header_range(stHeaderEntry* tar_header , size_t begin , size_t end);
+
 
 #endif	/* UTILS_H */
 
