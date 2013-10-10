@@ -107,9 +107,6 @@ int createTar(int nFiles, char *fileNames[], char tarName[]) {//LEAK_FREE
     //Relleno la cabecera en RAM y copio los datos de los ficheros en el tar
     for (i = 0; i < nFiles; i++) {
 
-        /* PARTE OPCIONAL 1 AQUI!!!!!!!!! */
-        remove_slash(fileNames[i]);
-
         //Abrimos fichero fuente
         if ((inputFile = fopen(fileNames[i], "r")) == NULL) {
             fprintf(stderr, "No se ha podido abrir el fichero tar %s: \n", fileNames[i]);
@@ -119,6 +116,11 @@ int createTar(int nFiles, char *fileNames[], char tarName[]) {//LEAK_FREE
             remove(tarName);
             return (EXIT_FAILURE);
         }
+        
+        
+        /* PARTE OPCIONAL 1 AQUI!!!!!!!!! */
+        remove_slash(fileNames[i]);
+        
         //Rellenamos la cabecera
         header[i].name = clone_str(fileNames[i]);
         header[i].name_length = strlen(fileNames[i]) + 1;
