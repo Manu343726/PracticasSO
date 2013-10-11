@@ -119,7 +119,7 @@ int createTar(int nFiles, char *fileNames[], char tarName[]) {//LEAK_FREE
         
         
         /* PARTE OPCIONAL 1 AQUI!!!!!!!!! */
-        remove_slash(fileNames[i]);
+        //remove_slash(fileNames[i]);
         
         //Rellenamos la cabecera
         header[i].name = clone_str(fileNames[i]);
