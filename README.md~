@@ -1,0 +1,45 @@
+# PracticasSO  
+
+Prácticas asignatura Sistemas Operativos
+
+# Descripción del código entregado
+
+La entrega contiene 4 archivos de código:
+ - **mitar.c**:  Incluye el punto de entrada del programa y el código encargado de leer y parsear los argumentos del programa. 
+ - **mitar.h**: Declaración de las funciones de *"compresión"* y *"descompresión"* del tar, así como de las estructuras de datos utlizadas en dichas funciones.
+ - **rut_mitar.c**: Implementación de las rutinas de *"compresión"* y *"descompresión"*.  He incluido un pequeño esquema para dejar bien claro el layout de mis archivos tar y el esquema que he seguido:
+
+ /****************************************************************************************************************************************************
+ *  TAR FILE LAYOUT:                                                                                                                                 *
+ *  ===============                                                                                                                                  *
+ *                                                                                                                                                   *
+ *                                                                                                                                                   *
+ *       sizeof(int)     header1 size                                                        headern_size                                            *
+ *   <---------------> <-------------> <------------------------ ... --------------------> <------------->                                           *
+ *                                                                                                                                                   *
+ *  +-----------------+---------------+---------------------------------------------------+---------------+----------------+-----+----------------+  *
+ *  | number_of_files | file_1_header |                          ...                      | file_n_header | file_1_content | ... | file_n_content |  *
+ *  +-----------------+---------------+---------------------------------------------------+---------------+----------------+-----+----------------+  *
+ *                                                                                                                                                   *
+ *                     <--------------------------------------------------------------------------------->                                           *
+ *                        Σ( sizeof(size_t) + sizeof(size_t) + (sizeof(char) * header[i].name_langth) )                                              *
+ *                                                                                                                                                   *
+ *                                                                                                                                                   *
+ *  FILE HEADER LAYOUT:                                                                                                                              *
+ *  ==================                                                                                                                               *
+ *                                                                                                                                                   *
+ *                                                                                                                                                   *
+ *     sizeof(size_t)     sizeof(char) * name_length     sizeof(size_t)                                                                              *
+ *  <-----------------> <----------------------------> <---------------->                                                                            *
+ *                                                                                                                                                   *
+ * +-------------------+------------------------------+------------------+                                                                           *
+ * |    name_length    |         file_name            |     file_size    |                                                                           *
+ * +-------------------+------------------------------+------------------+                                                                           *
+ *                                                                                                                                                   *
+ * NOTE: file_name includes \0 (name_langth is the length of the array, not the length of the string).                                               *
+ *                                                                                                                                                   *
+ ****************************************************************************************************************************************************/
+
+
+
+

@@ -62,7 +62,7 @@ void write_tar_header(FILE* file , stHeaderEntry* headers , int n_files);
  * |    name_length    |         file_name            |     file_size    |                                                                           *
  * +-------------------+------------------------------+------------------+                                                                           *
  *                                                                                                                                                   *
- * NOTE: file_name includes \0 (name_langth is the length of the array, not the length of the string).                                               *
+ * NOTE: file_name includes \0 (name_langth is the length of the array, not the length of the string).                                               *                                           *
  *                                                                                                                                                   *
  ****************************************************************************************************************************************************/
 
