@@ -20,6 +20,9 @@
 #define DISK_LBA int
 #define BOOLEAN int
 
+#define BLOCK_FREE 0
+#define BLOCK_OCUPIED 1
+
 #define SUPERBLOQUE_IDX 0
 #define MAPA_BITS_IDX 1
 #define DIRECTORIO_IDX 2

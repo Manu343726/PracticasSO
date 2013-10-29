@@ -126,13 +126,9 @@ int myImport(char* nombreArchivoExterno, MiSistemaDeFicheros* miSistemaDeFichero
 int myExport(MiSistemaDeFicheros* miSistemaDeFicheros, char* nombreArchivoInterno, char* nombreArchivoExterno) {
 	// Buscamos el archivo "nombreArchivoInterno"
 	int i = 0;
-	while (i < MAX_ARCHIVOS_POR_DIRECTORIO) {
-		// ...
-		i++;
-	}
-	if(i>=MAX_ARCHIVOS_POR_DIRECTORIO) {
+	
+	if( ( i = buscaPosDirectorio( miSistemaDeFicheros , nombreArchivoInterno ) ) == -1 )
 		return 1;
-	}
 
 	int numNodoActual = miSistemaDeFicheros->directorio.archivos[i].idxNodoI;
 
@@ -174,13 +170,37 @@ int myExport(MiSistemaDeFicheros* miSistemaDeFicheros, char* nombreArchivoIntern
 
 int myRm(MiSistemaDeFicheros* miSistemaDeFicheros, char* nombreArchivo) {
 	/// Completar:
-	// Busca el archivo con nombre "nombreArchivo"
-	// Obtiene el nodo-i asociado y lo actualiza
-	// Actualiza el superbloque (numBloquesLibres) y el mapa de bits
-	// Libera el puntero y lo hace NULL
-	// Actualiza el archivo
+	int idx_archivo;
+	
+	//Buscar elarchivo:
+	if( ( idx_archivo = buscaPosDirectorio( miSistemaDeFicheros , nombreArchivoInterno ) ) == -1 )
+		return 1;
+	
+	EstructuraArchivo* archivo = miSistemaDeFicheros->directorio.archivos + idx_archivo;
+	
+	//Buscar el nodoi:
+	int idx_nodoi = archivo->idxNodoI;
+	EstructuraNodoI* nodoi = miSistemaDeFicheros->nodosI[idx_nodoi];
+	
+	// Actualiza el superbloque (numBloquesLibres) y el mapa de bits:
+	miSistemaDeFicheros->superBloque.nomBloquesLibres += nodoi->numBloques;
+	int i;
+	for( i = 0 ; i < nodoi->numBloques ; ++i )
+		miSistemaDeFicheros->mapaDeBits[nodoi->idxBloques[i]] = BLOCK_FREE;
+
+	// Libera el puntero y lo hace NULL:
+	//free( nodoi );
+	//miSistemaDeFicheros->nodosI[idx_nodoi] = NULL;
+	
+	// Actualiza el archivo:
+	archivo->libre = true;
+	
 	// Finalmente, actualiza en disco el directorio, nodoi, mapa de bits y superbloque
-	// ...
+	escribeDirectorio( miSistemaDeArhcivos );
+	escribeNodoI( miSistemaDeArchivos , idx_nodoi , nodoI );
+	escribeMapaDeBits( miSistemaDeFicheros );
+	escribeSuperBloque( miSistemaDeArchivos );
+	
 	return 0;
 }
 
