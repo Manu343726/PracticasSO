@@ -207,11 +207,19 @@ int myRm(MiSistemaDeFicheros* miSistemaDeFicheros, char* nombreArchivo) {
 void myLs(MiSistemaDeFicheros* miSistemaDeFicheros) {
 	struct tm* localTime;
 	int numArchivosEncontrados = 0;
-	EstructuraNodoI nodoActual;
+	EstructuraNodoI* nodoActual;
+	EstructuraArchivo* archivo_actual;
 	int i;
 	// Recorre el sistema de ficheros, listando los archivos encontrados
 	for (i = 0; i < MAX_ARCHIVOS_POR_DIRECTORIO; i++) {
-		// ...
+		archivo_actual = miSistemaDeFicheros->directorio.archivos + i;
+		
+		if( archivo_actual->libre )
+		{
+			numArchivosEncontrados++;
+			
+			printf( "
+		}
 	}
 
 	if (numArchivosEncontrados == 0) {
