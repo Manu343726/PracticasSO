@@ -1,0 +1,24 @@
+gcc -Wall -g -c MiSistemaDeFicheros.c
+gcc -Wall -g -c parse.c
+gcc -Wall -g -c common.c
+common.c: En la función ‘initNodosI’:
+common.c:71:5: aviso: declaración implícita de la función ‘malloc’ [-Wimplicit-function-declaration]
+     EstructuraNodoI* temp = malloc(sizeof (EstructuraNodoI));
+     ^
+common.c:71:29: aviso: declaración implícita incompatible de la función interna ‘malloc’ [activado por defecto]
+     EstructuraNodoI* temp = malloc(sizeof (EstructuraNodoI));
+                             ^
+common.c: En la función ‘buscaPosDirectorio’:
+common.c:134:13: aviso: declaración implícita de la función ‘strncmp’ [-Wimplicit-function-declaration]
+             if (strncmp(nombre, miSistemaDeFicheros->directorio.archivos[i].nombreArchivo, strlen(nombre)) == 0)
+             ^
+common.c:134:13: aviso: declaración implícita de la función ‘strlen’ [-Wimplicit-function-declaration]
+common.c:134:92: aviso: declaración implícita incompatible de la función interna ‘strlen’ [activado por defecto]
+             if (strncmp(nombre, miSistemaDeFicheros->directorio.archivos[i].nombreArchivo, strlen(nombre)) == 0)
+                                                                                            ^
+gcc -Wall -g -c util.c
+util.c: En la función ‘myMkfs’:
+util.c:50:18: aviso: se define la variable ‘nodoActual’ pero no se usa [-Wunused-but-set-variable]
+  EstructuraNodoI nodoActual;
+                  ^
+gcc MiSistemaDeFicheros.o parse.o common.o util.o -lm -lreadline -o MiSistemaDeFicheros

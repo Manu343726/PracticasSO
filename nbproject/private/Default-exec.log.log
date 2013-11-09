@@ -1,0 +1,82 @@
+called: gcc
+	/home/manu343726/Dropbox/CLASE/Tercero/SO/copia de PracticasSO
+	gcc
+	-Wall
+	-g
+	-c
+	MiSistemaDeFicheros.c
+
+called: gcc
+	/home/manu343726/Dropbox/CLASE/Tercero/SO/copia de PracticasSO
+	gcc
+	-Wall
+	-g
+	-c
+	parse.c
+
+called: gcc
+	/home/manu343726/Dropbox/CLASE/Tercero/SO/copia de PracticasSO
+	gcc
+	-Wall
+	-g
+	-c
+	common.c
+
+called: gcc
+	/home/manu343726/Dropbox/CLASE/Tercero/SO/copia de PracticasSO
+	gcc
+	-Wall
+	-g
+	-c
+	util.c
+
+called: gcc
+	/home/manu343726/Dropbox/CLASE/Tercero/SO/copia de PracticasSO
+	gcc
+	MiSistemaDeFicheros.o
+	parse.o
+	common.o
+	util.o
+	-lm
+	-lreadline
+	-o
+	MiSistemaDeFicheros
+
+called: /usr/bin/ld
+	/home/manu343726/Dropbox/CLASE/Tercero/SO/copia de PracticasSO
+	/usr/bin/ld
+	--build-id
+	--eh-frame-hdr
+	--hash-style=gnu
+	-m
+	elf_x86_64
+	-dynamic-linker
+	/lib64/ld-linux-x86-64.so.2
+	-o
+	MiSistemaDeFicheros
+	/usr/lib/gcc/x86_64-unknown-linux-gnu/4.8.2/../../../../lib/crt1.o
+	/usr/lib/gcc/x86_64-unknown-linux-gnu/4.8.2/../../../../lib/crti.o
+	/usr/lib/gcc/x86_64-unknown-linux-gnu/4.8.2/crtbegin.o
+	-L/usr/lib/gcc/x86_64-unknown-linux-gnu/4.8.2
+	-L/usr/lib/gcc/x86_64-unknown-linux-gnu/4.8.2/../../../../lib
+	-L/lib/../lib
+	-L/usr/lib/../lib
+	-L/usr/lib/gcc/x86_64-unknown-linux-gnu/4.8.2/../../..
+	MiSistemaDeFicheros.o
+	parse.o
+	common.o
+	util.o
+	-lm
+	-lreadline
+	-lgcc
+	--as-needed
+	-lgcc_s
+	--no-as-needed
+	-lc
+	-lgcc
+	--as-needed
+	-lgcc_s
+	--no-as-needed
+	/usr/lib/gcc/x86_64-unknown-linux-gnu/4.8.2/crtend.o
+	/usr/lib/gcc/x86_64-unknown-linux-gnu/4.8.2/../../../../lib/crtn.o
+

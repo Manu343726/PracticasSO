@@ -49,13 +49,13 @@ int myMkfs(MiSistemaDeFicheros* miSistemaDeFicheros, int tamDisco, char* nombreA
 	/// NODOS-I
 	EstructuraNodoI nodoActual;
 	nodoActual.libre = 1;
-	// Escribimos nodoActual MAX_NODOSI veces en disco PERO ESTAIS MAL!!! PERO QUIEN COJONES HA ESCRITO ESTO!
+	// Escribimos nodoActual MAX_NODOSI veces en disco
 	// ... 
-	
-	//PERO QUE COJONES ESTAIS HACIEEEENDO!!!! ESCRIBIR EL DISCO COMO LIBRE PARA LUEGO LEERLO Y MARCAR COMO NULL TODO!!!
-	
+
 	for( i = 0 ; i < MAX_NODOSI ; ++i )
-		miSistemaDeFicheros->nodosI[i] = NULL;
+            escribeNodoI( miSistemaDeFicheros , i , &nodoActual );
+        
+        miSistemaDeFicheros->numNodosLibres = MAX_NODOSI;
 
 	/// SUPERBLOQUE
 	// Inicializamos el superbloque (ver common.c) y lo escribimos en disco
@@ -97,7 +97,7 @@ int myImport(char* nombreArchivoExterno, MiSistemaDeFicheros* miSistemaDeFichero
 	/// Comprobamos que hay suficiente espacio
 	// stStat.st_size > ...
 	// ...
-	if( stStat.st_size < miSistemaDeFicheros->superBloque.numBloquesLibres * miSistemaDeFicheros->superBloque.tamBloque )
+	if( stStat.st_size > miSistemaDeFicheros->superBloque.numBloquesLibres * miSistemaDeFicheros->superBloque.tamBloque )
 		return 3;
 
 	/// Comprobamos que el tamaño total es suficientemente pequeño para ser almacenado en MAX_BLOCKS_PER_FILE
@@ -116,7 +116,7 @@ int myImport(char* nombreArchivoExterno, MiSistemaDeFicheros* miSistemaDeFichero
 	BOOLEAN archivoLibreEncontrado = false;
 	int idxArchivoLibre = 0;
 
-	if( buscaPosDirectorio( miSistemaDeFicheros , nombreArchivoInterno ) < 0 )
+	if( buscaPosDirectorio( miSistemaDeFicheros , nombreArchivoInterno ) >= 0 )
 		return 5;
 	
 	while (idxArchivoLibre < MAX_ARCHIVOS_POR_DIRECTORIO && !archivoLibreEncontrado ) {
@@ -167,6 +167,8 @@ int myImport(char* nombreArchivoExterno, MiSistemaDeFicheros* miSistemaDeFichero
 	reservaBloquesNodosI( miSistemaDeFicheros , nodo->idxBloques , nodo->numBloques );
 
 	miSistemaDeFicheros->superBloque.numBloquesLibres = myQuota( miSistemaDeFicheros );
+        miSistemaDeFicheros->numNodosLibres--;
+        miSistemaDeFicheros->nodosI[numNodoI] = nodo;
 
 
 	escribeDatos( miSistemaDeFicheros , handle , numNodoI );
@@ -278,14 +280,14 @@ void myLs(MiSistemaDeFicheros* miSistemaDeFicheros) {
 
 			localTime = localtime( &nodoActual->tiempoModificado );
 
-			printf( "%d/%d/%d %d:%d:%d  " , localTime->tm_year + 1900 , 
-											localTime->tm_mon + 1     , 
-											localTime->tm_mday        , 
-											localTime->tm_hour        , 
-											localTime->tm_min         , 
-											localTime->tm_sec
+			printf( "%.2d/%.2d/%.2d %.2d:%.2d:%.2d  " ,localTime->tm_mday                , 
+                                                                   localTime->tm_mon + 1             , 
+                                                                   (localTime->tm_year + 1900) % 100 , 
+                                                                   localTime->tm_hour                , 
+                                                                   localTime->tm_min                 , 
+                                                                   localTime->tm_sec
 				  );
-			printf( "%d  " , nodoActual->tamArchivo );
+			printf( "%d bytes " , nodoActual->tamArchivo );
 			printf( "%s"   , archivo->nombreArchivo );
 
 			numArchivosEncontrados++;

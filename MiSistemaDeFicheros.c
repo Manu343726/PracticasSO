@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
     parseInfo* info; // Almacena toda la información que retorna el parser
     struct commandType* comando; // Almacena el comando y la lista de argumentos
     int ret; // Código de retorno de las llamadas a funciones
-
+    
     if ((argc == 4) && (argv[1][1] == 'm')) { // ¿Por qué comprobar toda la longitud del argumendo :-)?
         // ./MiSistemaDeFicheros -mkfs tamDisco nombreArchivo
     	ret = myMkfs(&miSistemaDeFicheros, atoi(argv[2]), argv[3]);
