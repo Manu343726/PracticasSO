@@ -228,16 +228,18 @@ int myExport( MiSistemaDeFicheros* miSistemaDeFicheros , char* nombreArchivoInte
 
     // Copiamos bloque a bloque del archivo interno al externo:
     EstructuraNodoI* temp = miSistemaDeFicheros->nodosI[numNodoActual];
-    char buffer[TAM_BLOQUE_BYTES];
+    unsigned char buffer[TAM_BLOQUE_BYTES];
 
     for ( i = 0; i < temp->numBloques - 1; i++ )
     {
+        lseek( miSistemaDeFicheros->discoVirtual , temp->idxBloques[i] * TAM_BLOQUE_BYTES , SEEK_SET );
         read( miSistemaDeFicheros->discoVirtual , &buffer , TAM_BLOQUE_BYTES );
+        write( handle , &buffer , TAM_BLOQUE_BYTES );
     }
 
     // Calculamos los bytes restantes y los escribimos:
-    int bytesRestantes = 0; // -> Incorrecto
-    // int bytesRestantes = ... -> Poner el cálculo correcto;
+    int bytesRestantes = miSistemaDeFicheros->superBloque.tamBloque - (temp->numBloques * miSistemaDeFicheros->superBloque.tamBloque - temp->tamArchivo);
+    
     lseek( miSistemaDeFicheros->discoVirtual , temp->idxBloques[i] * TAM_BLOQUE_BYTES , SEEK_SET );
     read( miSistemaDeFicheros->discoVirtual , &buffer , bytesRestantes );
     write( handle , buffer , bytesRestantes );
@@ -303,7 +305,8 @@ void myLs( MiSistemaDeFicheros* miSistemaDeFicheros )
 
             localTime = localtime( &nodoActual->tiempoModificado );
 
-            printf( "%.2d/%.2d/%.2d %.2d:%.2d:%.2d  " , localTime->tm_mday ,
+            printf( "%.2d/%.2d/%.2d %.2d:%.2d:%.2d  " ,
+                    localTime->tm_mday ,
                     localTime->tm_mon + 1 ,
                     ( localTime->tm_year + 1900 ) % 100 ,
                     localTime->tm_hour ,
