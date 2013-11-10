@@ -10,9 +10,9 @@ svn+ssh://nachog@source.dacya.ucm.es/forja/scmrepos/svn/so-grado
 2013-10-06T16:13:15.931486Z
 27
 jlrisco
-
-
-
+has-props
+has-prop-mods
+svn:special svn:externals svn:needs-lock
 
 
 
@@ -25,40 +25,6 @@ jlrisco
 
 
 c80261ab-62e2-463d-b490-0871665aaa4a
-
-test2.txt
-file
-
-
-
-
-2013-10-11T14:22:25.000000Z
-c2971782c2ed8ac5b9c010b1252fc7d0
-2013-10-06T16:13:15.931486Z
-27
-jlrisco
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-27387
 
 leeme.txt
 file
@@ -127,4 +93,38 @@ has-props
 
 
 359779
+
+test2.txt
+file
+
+
+
+
+2013-10-11T14:22:25.000000Z
+c2971782c2ed8ac5b9c010b1252fc7d0
+2013-10-06T16:13:15.931486Z
+27
+jlrisco
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+27387
 
