@@ -174,6 +174,7 @@ int myImport( char* nombreArchivoExterno , MiSistemaDeFicheros* miSistemaDeFiche
         return 10;
 
     nodo->libre = false;
+	nodo->ptr_io = 0;
     nodo->tamArchivo = stStat.st_size;
     nodo->numBloques = ceil( (float) stStat.st_size / (float) TAM_BLOQUE_BYTES );
     nodo->tiempoModificado = time( NULL );
@@ -339,3 +340,92 @@ void myExit( MiSistemaDeFicheros* miSistemaDeFicheros )
     }
     exit( 1 );
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////// PARTE EXTRA. PROTOTIPO DE FUNCIONES QUE DEBEN IMPLEMENTARSE//////////
+// lseek
+int myLseek(MiSistemaDeFicheros* miSistemaDeFicheros, char* nombreArchivoInterno, int offset)
+{
+	int idx_archivo = buscaPosDirectorio( miSistemaDeFicheros , nombreArchivoInterno );
+
+	if( idx_archivo < 0 )
+		return 1;
+
+	EstructuraArchivo* archivo = miSistemaDeFicheros->directorio.archivos + idx_archivo;
+	EstructuraNodoI*   nodo    = miSistemaDeFicheros->nodosI + archivo->idxNodoI;
+	
+	if( offset < 0 || offset >= nodo->tamArchivo )
+		return 2;
+
+	nodo->ptr_io = offset;
+
+	return 0;
+}
+
+// read
+int myRead(MiSistemaDeFicheros* miSistemaDeFicheros, char* nombreArchivoInterno, int nbytes)
+{
+	int idx_archivo = buscaPosDirectorio( miSistemaDeFicheros , nombreArchivoInterno );
+
+	if( idx_archivo < 0 )
+		return 1;
+
+	EstructuraArchivo archivo = miSistemaDeFicheros->directorio.archivos[idx_archivo];
+	EstructuraNodoI* nodo     = miSistemaDeFicheros->nodosI[archivo.idxNodoI];
+
+	if( nodo->ptr_io + nbytes >= nodo->tamArchivo )
+		return 2;
+
+    unsigned char buffer[TAM_BLOQUE_BYTES];
+	size_t bloque_inicial =  nodo->ptr_io           / TAM_BLOQUE_BYTES;
+	size_t bloque_final   = (nodo->ptr_io + nbytes) / TAM_BLOQUE_BYTES;
+	size_t i;
+
+	printf( "nodo inicial: %d \n" , bloque_inicial );
+	printf( "nodo final: %d \n"   , bloque_final );
+
+
+	int bytesRestantes = TAM_BLOQUE_BYTES - (nodo->ptr_io % TAM_BLOQUE_BYTES);
+
+    lseek( miSistemaDeFicheros->discoVirtual , (nodo->idxBloques[bloque_inicial] * TAM_BLOQUE_BYTES)  + (nodo->ptr_io % TAM_BLOQUE_BYTES) , SEEK_SET );
+    read( miSistemaDeFicheros->discoVirtual  , &buffer , bytesRestantes );
+
+	printf("Datos iniciales: %s" , buffer);
+
+    for ( i = bloque_inicial + 1 ; i < bloque_final ; i++ )
+    {
+        lseek( miSistemaDeFicheros->discoVirtual , nodo->idxBloques[i] * TAM_BLOQUE_BYTES , SEEK_SET );
+        read( miSistemaDeFicheros->discoVirtual , &buffer , TAM_BLOQUE_BYTES );
+        
+		printf("Bloque %d: %s" , i , buffer);
+    }
+
+	if( bloque_inicial != bloque_final)
+	{
+		bytesRestantes = (nodo->ptr_io + nbytes) % TAM_BLOQUE_BYTES;
+
+		lseek( miSistemaDeFicheros->discoVirtual , nodo->idxBloques[bloque_final] * TAM_BLOQUE_BYTES , SEEK_SET );
+		read( miSistemaDeFicheros->discoVirtual , &buffer , bytesRestantes );
+		
+		printf("Datos finales: %s" , buffer);
+
+	
+		miSistemaDeFicheros->nodosI[archivo.idxNodoI]->ptr_io += nbytes;
+	}
+	return 0;
+}
+
+//write
+int myWrite(MiSistemaDeFicheros* miSistemaDeFicheros, char* nombreArchivoInterno, char* string)
+{
+	
+}
+
+
+
+
+
+
+
+
+

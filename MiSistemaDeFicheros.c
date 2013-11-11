@@ -2,6 +2,7 @@
 #include "parse.h"
 #include "util.h"
 #include <readline/readline.h>
+#include <stdlib.h>
 
 int main(int argc, char** argv) {
     MiSistemaDeFicheros miSistemaDeFicheros;
@@ -11,7 +12,7 @@ int main(int argc, char** argv) {
     parseInfo* info; // Almacena toda la información que retorna el parser
     struct commandType* comando; // Almacena el comando y la lista de argumentos
     int ret; // Código de retorno de las llamadas a funciones
-    
+
     if ((argc == 4) && (argv[1][1] == 'm')) { // ¿Por qué comprobar toda la longitud del argumendo :-)?
         // ./MiSistemaDeFicheros -mkfs tamDisco nombreArchivo
     	ret = myMkfs(&miSistemaDeFicheros, atoi(argv[2]), argv[3]);
@@ -62,6 +63,34 @@ int main(int argc, char** argv) {
             	ret = myExport(&miSistemaDeFicheros, comando->VarList[1], comando->VarList[2]);
                 if (ret) {
                     fprintf(stderr, "Incapaz de exportar el archivo interno %s a el archivo externo %s, código de error: %d\n", comando->VarList[1], comando->VarList[2], ret);
+                }
+            }
+        } else if (strncmp(comando->command, "lseek", strlen("lseek")) == 0) { // LSEEK
+            if (comando->VarNum != 3) {
+                fprintf(stderr, "lseek nombreArchivoInterno offset \n");
+            } else {
+            	ret = myLseek(&miSistemaDeFicheros, comando->VarList[1], atoi(comando->VarList[2]) );
+                if (ret) {
+                    fprintf(stderr, "Incapaz de realizar lssek de %d sobre el archivo interno %s  código de error: %d\n", atoi(comando->VarList[2]), comando->VarList[1], ret);
+                }
+            }
+        } else if (strncmp(comando->command, "read", strlen("read")) == 0) { // READ
+            if (comando->VarNum != 3) {
+                fprintf(stderr, "read nombreArchivoInterno size \n");
+            } else {
+            	ret = myRead(&miSistemaDeFicheros, comando->VarList[1], atoi(comando->VarList[2]));
+                if (ret) {
+                    fprintf(stderr, "Incapaz de leer %d bytes del archivo interno %s , código de error: %d\n", comando->VarList[2], atoi(comando->VarList[2]), ret);
+                }
+            }
+            
+        } else if (strncmp(comando->command, "write", strlen("write")) == 0) { // WRITE
+            if (comando->VarNum != 3) {
+                fprintf(stderr, "write nombreArchivoInterno cadenaDeCaracteres \n");
+            } else {
+            	ret = myWrite(&miSistemaDeFicheros, comando->VarList[1], comando->VarList[2]);
+                if (ret) {
+                    fprintf(stderr, "Incapaz de escribir la cadena %s en el archivo interno %s , código de error: %d\n", comando->VarList[2], comando->VarList[1], ret);
                 }
             }
         } else if (strncmp(comando->command, "rm", strlen("rm")) == 0) { // RM

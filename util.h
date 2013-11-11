@@ -30,5 +30,17 @@ void myLs(MiSistemaDeFicheros* miSistemaDeFicheros);
 // Libera memoria y cierra el sistema de ficheros
 void myExit(MiSistemaDeFicheros* miSistemaDeFicheros);
 
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////// PARTE EXTRA. PROTOTIPO DE FUNCIONES QUE DEBEN IMPLEMENTARSE//////////
+// lseek
+int myLseek(MiSistemaDeFicheros* miSistemaDeFicheros, char* nombreArchivoInterno, int offset);
+
+// read
+int myRead(MiSistemaDeFicheros* miSistemaDeFicheros, char* nombreArchivoInterno, int nbytes);
+
+//write
+int myWrite(MiSistemaDeFicheros* miSistemaDeFicheros, char* nombreArchivoInterno, char* string);
+
+
 #endif	/* UTIL_H */
 

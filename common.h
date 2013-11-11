@@ -46,6 +46,8 @@ typedef struct EstructuraNodoI {
   time_t tiempoModificado;                      // Tiempo de modificación
   DISK_LBA idxBloques[MAX_BLOQUES_POR_ARCHIVO]; // Bloques
   BOOLEAN libre;                                // Nodo libre
+
+	size_t ptr_io; //Puntero lectura/escritura
 } EstructuraNodoI;
 
 #define NODOSI_POR_BLOQUE (TAM_BLOQUE_BYTES/sizeof(EstructuraNodoI))
