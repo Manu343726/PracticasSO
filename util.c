@@ -273,6 +273,9 @@ int myRm( MiSistemaDeFicheros* miSistemaDeFicheros , char* nombreArchivo )
     miSistemaDeFicheros->superBloque.numBloquesLibres = myQuota( miSistemaDeFicheros );
 
     // Libera el puntero y lo hace NULL:
+    
+    nodoi->libre = true;
+    
     free( nodoi );
     miSistemaDeFicheros->nodosI[idx_nodoi] = NULL;
 
@@ -281,7 +284,6 @@ int myRm( MiSistemaDeFicheros* miSistemaDeFicheros , char* nombreArchivo )
 
     // Finalmente, actualiza en disco el directorio, nodoi, mapa de bits y superbloque
     escribeDirectorio( miSistemaDeFicheros );
-    escribeNodoI( miSistemaDeFicheros , idx_nodoi , nodoi );
     escribeMapaDeBits( miSistemaDeFicheros );
     escribeSuperBloque( miSistemaDeFicheros );
 
