@@ -1,19 +1,22 @@
-all: MiSistemaDeFicheros
+CC = gcc
 
-MiSistemaDeFicheros: MiSistemaDeFicheros.o parse.o common.o util.o
-	gcc MiSistemaDeFicheros.o parse.o common.o util.o -lm -lreadline -o MiSistemaDeFicheros
+CFLAGS = -Wall -DEXERCISE_FINISHING 
+##CFLAGS = -Wall -DEXERCISE_FINISHING  -DSYNCH_SIGNAL
 
-MiSistemaDeFicheros.o: MiSistemaDeFicheros.c
-	gcc -Wall -g -c MiSistemaDeFicheros.c
+LDFLAGS = -lpthread
 
-parse.o: parse.c
-	gcc -Wall -g -c parse.c
+TARGET = practica
 
-common.o: common.c
-	gcc -Wall -g -c common.c
+OBJS = clients.o sem.o varcond.o cbuffer.o mailbox.o main.o message.o server.o signal_handler.o 
 
-util.o: util.c
-	gcc -Wall -g -c util.c
+all: practica
 
-clean:
-	rm -rf *.o MiSistemaDeFicheros
+
+practica: $(OBJS)
+		$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET)  $(OBJS)
+
+.c.o: 
+	$(CC) $(CFLAGS) -c  $<
+
+clean: 
+		-rm -f *.o $(TARGET) 
