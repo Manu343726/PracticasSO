@@ -11,7 +11,7 @@ struct counting_sem * counting_sem_new(int count)
 	
 	sem = (struct counting_sem *)malloc(sizeof(struct counting_sem));
 	if (sem != NULL) {
-		sem->c = count;
+		sem->count = count;
 		pthread_cond_init(&(sem->cond), NULL);
 		pthread_mutex_init(&(sem->mutex), NULL);
 	}
@@ -79,7 +79,7 @@ timedout_counting_sem_wait(struct counting_sem *sem, int timeout)
 	
 	pthread_mutex_lock(&(sem->mutex));
 	
-	while (sem->c <= 0) {
+	while (sem->count <= 0) {
 		if (timeout > 0) {
 			time_needed = cond_wait(&(sem->cond), &(sem->mutex), timeout);
 			
@@ -92,7 +92,7 @@ timedout_counting_sem_wait(struct counting_sem *sem, int timeout)
 			cond_wait(&(sem->cond), &(sem->mutex), 0);
 		}
 	}
-	sem->c--;
+	sem->count--;
 	pthread_mutex_unlock(&(sem->mutex));
 	return time_needed;
 }
@@ -103,11 +103,11 @@ counting_sem_wait(struct counting_sem *sem)
 {	
 	pthread_mutex_lock(&(sem->mutex));
 	
-	while (sem->c <= 0) {
+	while (sem->count <= 0) {
 		pthread_cond_wait(&(sem->cond), &(sem->mutex));
 		
 	}
-	sem->c--;
+	sem->count--;
 	pthread_mutex_unlock(&(sem->mutex));
 	return 0;
 }
@@ -116,12 +116,10 @@ counting_sem_wait(struct counting_sem *sem)
 void
 counting_sem_signal(struct counting_sem *sem)
 {
-	
-	
 	pthread_mutex_lock(&(sem->mutex));
-	sem->c++;
+	sem->count++;
 	
-	if (sem->c > 1) {
+    if (sem->c > 1) {
 		sem->c = 1;
 	}
 	

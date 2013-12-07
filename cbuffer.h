@@ -3,7 +3,8 @@
 
 
 typedef struct
-{
+  //                                 Java!
+{ //                          |------------------|
     void** data;			/* Vector of pointers to items in the buffer */
 	unsigned int head;		/* Index of the first element // head in [0 .. max_size-1] */
 	unsigned int size;		/* Current Buffer size // size in [0 .. max_size] */

@@ -14,7 +14,7 @@ struct mi_cond_var* var_cond_new( ) {
             printf("Error creando el semáforo de la variable condicional\n");
         }
         pthread_mutex_init(&(vc->mutex), NULL);
-        vc->c=0;
+        vc->count=0;
         
     }
     return vc;
@@ -36,7 +36,7 @@ void var_cond_free(struct  mi_cond_var *vc) {
 void var_cond_signal(struct  mi_cond_var *vc) {
     
 	pthread_mutex_lock(&(vc->mutex));
-    if ( vc->c > 0)
+    if ( vc->count > 0)
         sem_post(&(vc->sem));
 	pthread_mutex_unlock(&(vc->mutex));
 }

@@ -2,10 +2,16 @@
 <configurationDescriptor version="90">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
-      <in>MiSistemaDeFicheros.c</in>
-      <in>common.c</in>
-      <in>parse.c</in>
+      <in>cbuffer.c</in>
+      <in>clients.c</in>
+      <in>mailbox.c</in>
+      <in>main.c</in>
+      <in>message.c</in>
+      <in>sem.c</in>
+      <in>server.c</in>
+      <in>signal_handler.c</in>
       <in>util.c</in>
+      <in>varcond.c</in>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -36,13 +42,72 @@
           <executablePath>MiSistemaDeFicheros</executablePath>
         </makeTool>
       </makefileType>
-      <item path="MiSistemaDeFicheros.c" ex="false" tool="0" flavor2="0">
+      <item path="cbuffer.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <preprocessorList>
+            <Elem>EXERCISE_FINISHING</Elem>
+          </preprocessorList>
+        </cTool>
       </item>
-      <item path="common.c" ex="false" tool="0" flavor2="0">
+      <item path="clients.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <preprocessorList>
+            <Elem>EXERCISE_FINISHING</Elem>
+          </preprocessorList>
+        </cTool>
       </item>
-      <item path="parse.c" ex="false" tool="0" flavor2="0">
+      <item path="mailbox.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <preprocessorList>
+            <Elem>EXERCISE_FINISHING</Elem>
+          </preprocessorList>
+        </cTool>
       </item>
-      <item path="util.c" ex="false" tool="0" flavor2="0">
+      <item path="main.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <preprocessorList>
+            <Elem>EXERCISE_FINISHING</Elem>
+          </preprocessorList>
+        </cTool>
+      </item>
+      <item path="message.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <preprocessorList>
+            <Elem>EXERCISE_FINISHING</Elem>
+          </preprocessorList>
+        </cTool>
+      </item>
+      <item path="sem.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <preprocessorList>
+            <Elem>EXERCISE_FINISHING</Elem>
+          </preprocessorList>
+        </cTool>
+      </item>
+      <item path="server.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <preprocessorList>
+            <Elem>EXERCISE_FINISHING</Elem>
+          </preprocessorList>
+        </cTool>
+      </item>
+      <item path="signal_handler.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <preprocessorList>
+            <Elem>EXERCISE_FINISHING</Elem>
+          </preprocessorList>
+        </cTool>
+      </item>
+      <item path="util.c" ex="false" tool="0" flavor2="2">
+        <cTool>
+        </cTool>
+      </item>
+      <item path="varcond.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <preprocessorList>
+            <Elem>EXERCISE_FINISHING</Elem>
+          </preprocessorList>
+        </cTool>
       </item>
     </conf>
   </confs>

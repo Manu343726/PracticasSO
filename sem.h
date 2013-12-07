@@ -11,7 +11,7 @@
 // IMPLEMENTATION of counting semaphores with lock+var. cond
 
 struct counting_sem {
-	 int c;
+	 int count;
 	pthread_cond_t cond;
 	pthread_mutex_t mutex;
 };

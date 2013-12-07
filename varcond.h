@@ -3,7 +3,7 @@
 
 struct mi_cond_var {
     sem_t sem;
-    int c;
+    int count;
     pthread_mutex_t mutex;
 };
 
