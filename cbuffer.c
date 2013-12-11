@@ -22,7 +22,7 @@ cbuffer_t* create_cbuffer_t ( unsigned int max_size )
     cbuffer->data = malloc( max_size * sizeof(void* ) );
     if ( cbuffer->data == NULL )
     {
-        free( cbuffer->data ); // <-- ¿Que es, para hacer la gracia?
+        free( cbuffer->data ); // <-- ¿Que es, para despistar?
         return NULL;
     }
     return cbuffer;
@@ -31,7 +31,7 @@ cbuffer_t* create_cbuffer_t ( unsigned int max_size )
 /* Release memory from circular buffer  */
 void destroy_cbuffer_t ( cbuffer_t* cbuffer )
 {
-    free( cbuffer->data ); //<-- No veo que liberes ningún elemento majete
+    free( cbuffer->data ); //<-- leak...
     cbuffer->size = 0;
     cbuffer->head = 0;
     cbuffer->max_size = 0;
@@ -65,7 +65,7 @@ void insert_cbuffer_t ( cbuffer_t* cbuffer , void* new_item )
     /* The buffer is full */
     if ( cbuffer->size == cbuffer->max_size )
     {
-        //I'm a Java programmer and I miss my GC: (See code bellow)
+        //I'm a Java programmer and I miss my GC...
         /* Overwriting head position */
         cbuffer->data[cbuffer->head] = new_item;
         /* Now head position must be the next one*/
@@ -94,8 +94,7 @@ void remove_cbuffer_t ( cbuffer_t* cbuffer )
 /* Returns the first element in the buffer */
 void* head_cbuffer_t ( cbuffer_t* cbuffer )
 {
-    printf( "ATENCION: funcion head_cbuffer_t NO IMPLEMENTADO. Devolviendo NULL\n" );
-    return NULL;
+    return cbuffer->data[cbuffer->head];
 }
 
 
