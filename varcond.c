@@ -48,7 +48,5 @@ void var_cond_signal(struct  mi_cond_var *vc) {
 // Asimismo, por construccion (ver codigo de var_cond_signal), se asume que 
 // el semaforo (vc->sem) nunca tendra un valor mayor que 0.
 int var_cond_wait(struct  mi_cond_var *vc, pthread_mutex_t* l) {
-   
-printf("ATENCION: funcion var_cond_wait NO implementada\n");
-return -1; 
-   }
+    
+}
