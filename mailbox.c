@@ -81,9 +81,16 @@ mbox_free(struct sys_mbox *mbox)
 void
 mbox_post( struct sys_mbox *mbox, void *msg)
 {
- printf("ATENCION funcion mbox_post NO implementada\n");
+    pthread_mutex_lock( &(mbox->mutex) );
 
+    while( is_full_cbuffer_t( mbox->cbuffer ) )
+        var_cond_wait( mbox->hayHueco , &(mbox->mutex) );
+    
+    insert_cbuffer_t( mbox->cbuffer , msg );
 
+    var_cond_signal( mbox->hayElem );
+
+    pthread_mutex_unlock( &(mbox->mutex) );
 }
 
 
@@ -95,8 +102,21 @@ mbox_post( struct sys_mbox *mbox, void *msg)
 void*
 mbox_fetch(struct sys_mbox *mbox)
 {
-printf("ATENCION funcion mbox_fetch NO implementada\n");
-return NULL;	
+    void* message = NULL;
+
+    pthread_mutex_lock( &(mbox->mutex) );
+
+    while( is_empty_cbuffer_t( mbox->cbuffer ) )
+        var_cond_wait( mbox->hayElem , &(mbox->mutex) );
+
+    message = head_cbuffer_t( mbox->cbuffer );
+
+    var_cond_signal( mbox->hayHueco );
+
+    pthread_mutex_unlock( &(mbox->mutex) );
+
+
+    return message;
 }
 
 
