@@ -51,7 +51,7 @@ void var_cond_signal(struct  mi_cond_var *vc) {
 int var_cond_wait(struct  mi_cond_var *vc, pthread_mutex_t* l) {
     pthread_mutex_unlock( l );
 
-    counting_sem_wait( vc->sem );
+    sem_wait( &(vc->sem) );
     
     pthread_mutex_lock( l );
 }

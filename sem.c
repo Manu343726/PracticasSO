@@ -119,8 +119,8 @@ counting_sem_signal(struct counting_sem *sem)
 	pthread_mutex_lock(&(sem->mutex));
 	sem->count++;
 	
-    if (sem->c > 1) {
-		sem->c = 1;
+    if (sem->count > 1) {
+		sem->count = 1;
 	}
 	
 	pthread_cond_broadcast(&(sem->cond));

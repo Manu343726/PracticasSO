@@ -139,7 +139,5 @@ int create_client(sys_mbox_t* mbox, enum _message_types_ m_type, int n_messages,
    	n_clients++;
 	clients[n_clients] = tmp;
 	
-	return 0;
-	
-	
+	return 0;	
 }
