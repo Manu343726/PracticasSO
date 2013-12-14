@@ -88,13 +88,19 @@ void remove_cbuffer_t ( cbuffer_t* cbuffer )
 {
     /* Now head position must be the next one*/
     if ( cbuffer->size != 0 )
+    {
         cbuffer->head = ( cbuffer->head + 1 ) % cbuffer->max_size;
+        cbuffer->size--;
+    }
 }
 
 /* Returns the first element in the buffer */
 void* head_cbuffer_t ( cbuffer_t* cbuffer )
 {
-    return cbuffer->data[cbuffer->head];
+    if( !is_empty_cbuffer_t( cbuffer ) )
+        return cbuffer->data[cbuffer->head];
+    
+    return NULL;
 }
 
 

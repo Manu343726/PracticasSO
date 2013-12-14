@@ -134,7 +134,9 @@ int create_client(sys_mbox_t* mbox, enum _message_types_ m_type, int n_messages,
 	// CREACION DE HILO (CON COMPROBACION DE ERRORES)
 	// EL IDENTIFICADOR DE HILO SE DEBE ALMACENAR EN LA VARIABLE tmp
 
-    pthread_create( &tmp , NULL , client_thread , argument ); 
+    if( pthread_create( &tmp , NULL , client_thread , argument ) != 0 )
+        return -1;
+        
     
    	n_clients++;
 	clients[n_clients] = tmp;

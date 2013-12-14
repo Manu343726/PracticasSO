@@ -81,16 +81,16 @@ mbox_free(struct sys_mbox *mbox)
 void
 mbox_post( struct sys_mbox *mbox, void *msg)
 {
-    pthread_mutex_lock( &(mbox->mutex) );
+    pthread_mutex_lock( mbox->mutex );
 
     while( is_full_cbuffer_t( mbox->cbuffer ) )
-        var_cond_wait( mbox->hayHueco , &(mbox->mutex) );
+        var_cond_wait( mbox->hayHueco , mbox->mutex );
     
     insert_cbuffer_t( mbox->cbuffer , msg );
 
     var_cond_signal( mbox->hayElem );
 
-    pthread_mutex_unlock( &(mbox->mutex) );
+    pthread_mutex_unlock( mbox->mutex );
 }
 
 
@@ -104,16 +104,17 @@ mbox_fetch(struct sys_mbox *mbox)
 {
     void* message = NULL;
 
-    pthread_mutex_lock( &(mbox->mutex) );
+    pthread_mutex_lock( mbox->mutex );
 
     while( is_empty_cbuffer_t( mbox->cbuffer ) )
-        var_cond_wait( mbox->hayElem , &(mbox->mutex) );
+        var_cond_wait( mbox->hayElem , mbox->mutex );
 
     message = head_cbuffer_t( mbox->cbuffer );
+    remove_cbuffer_t( mbox->cbuffer );
 
     var_cond_signal( mbox->hayHueco );
 
-    pthread_mutex_unlock( &(mbox->mutex) );
+    pthread_mutex_unlock( mbox->mutex );
 
 
     return message;

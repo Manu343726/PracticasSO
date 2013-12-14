@@ -37,7 +37,7 @@ void var_cond_free(struct  mi_cond_var *vc) {
 void var_cond_signal(struct  mi_cond_var *vc) {
     
 	pthread_mutex_lock(&(vc->mutex));
-    if ( vc->count > 0)
+    if( vc->count > 0)
         sem_post(&(vc->sem));
 	pthread_mutex_unlock(&(vc->mutex));
 }
@@ -49,9 +49,16 @@ void var_cond_signal(struct  mi_cond_var *vc) {
 // Asimismo, por construccion (ver codigo de var_cond_signal), se asume que 
 // el semaforo (vc->sem) nunca tendra un valor mayor que 0.
 int var_cond_wait(struct  mi_cond_var *vc, pthread_mutex_t* l) {
+    
+    vc->count++;
+    
     pthread_mutex_unlock( l );
 
     sem_wait( &(vc->sem) );
     
     pthread_mutex_lock( l );
+    
+    vc->count--;
+    
+    return 1;
 }
