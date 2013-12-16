@@ -48,6 +48,12 @@ void SIGINT_handler(int signo) {
     fprintf(logfile,"thread %u: caught signal %d (SIGINT)\n", (unsigned int) id, signo);
 }
 
+void SIGUSR1_handler( int signal_number )
+{
+    create_client( gbl_mbox , default_client_type , nr_msgs , nr_secs );
+    my_resume();
+}
+
 
 void* signal_handler_thread(void * c) {
 #ifndef SYNCH_SIGNAL	
