@@ -79,14 +79,17 @@ mbox_free(struct sys_mbox *mbox)
 // Si hay al menos un hueco, se insertara el mensaje en el mailbox y se saldra
 
 void
-mbox_post( struct sys_mbox *mbox, void *msg)
+mbox_Multipost( struct sys_mbox *mbox, void* msg[] , int nmsg )
 {
+    size_t i = 0;
+
     pthread_mutex_lock( mbox->mutex );
 
-    while( is_full_cbuffer_t( mbox->cbuffer ) )
+    while( free_size_cbuffer_t( mbox->cbuffer ) <  nmsg )
         var_cond_wait( mbox->hayHueco , mbox->mutex );
     
-    insert_cbuffer_t( mbox->cbuffer , msg );
+    for( i = 0 ; i < nmsg ; ++i )
+      insert_cbuffer_t( mbox->cbuffer , msg[i] );
 
     var_cond_signal( mbox->hayElem );
 

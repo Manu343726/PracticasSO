@@ -22,6 +22,8 @@ void destroy_cbuffer_t ( cbuffer_t* cbuffer );
 /* Returns the number of elements in the buffer */
 int size_cbuffer_t ( cbuffer_t* cbuffer );
 
+size_t free_size_cbuffer_t( cbuffer_t* cbuffer );
+
 /* Returns a non-zero value when buffer is full */
 int is_full_cbuffer_t ( cbuffer_t* cbuffer );
 

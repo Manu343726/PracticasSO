@@ -18,6 +18,7 @@ enum _message_types_ default_client_type=TIME;
 struct client_arg {
 	enum _message_types_ m_type;
 	int n_messages;
+    int messages_per_post;
 	int period;
 	sys_mbox_t* mbox;
 };
@@ -69,36 +70,50 @@ static void process_answer(message_t* msg) {
 // de resultado
 void* client_thread (void* ptr) {
 	struct client_arg* arg;
-	int i;
+	int i,j,k;
 	message_t* msg;
-	
+	int mess_per_post=1;
+
 	arg = (struct client_arg*) ptr;
 	fprintf(logfile,"NEW client of type %d with period %d \n",arg->m_type, arg->period);
 	
-	for (i=0;i<arg->n_messages; i++) {
-		if (  ( msg=new_message(arg->m_type ) )  == NULL ) {
-			fprintf(logfile,"Error when creating  message\n");
-		pthread_exit(NULL);
-		}
-		
-		// Post message to mailbox
-		mbox_post( arg->mbox, msg);
-		
-		
-		// Wait for server to finish the work
-		counting_sem_wait(msg->op_completed);
-		
-		
-		// We can process and free the message
-		process_answer(msg);
-		free_message(msg);
-		
+	// Asumo que el nuevo campo del tipo client_arg se llama mess_post
+	mess_per_post = arg->mess_post;
+	for (i=0;i<arg->n_messages; i+=mess_per_post) {
+			// ARRAY DE MENSAJES
+			void* msg_q[mess_per_post];
+			for (j=0;j<mess_per_post; j++) {
+				if (  ( msg=new_message(arg->m_type ) )  == NULL ) {
+					fprintf(logfile,"Error when creating  message\n");
+					pthread_exit(NULL);
+				}
+				msg_q[j]= (void*)msg;
+			}
+
+			// Llamada Multipost
+			mbox_Multipost ( arg->mbox, msg_q, mess_per_post);
+
+			// Para cada mensaje del array, esperar a que el servidor termine
+			// y procesar el mensaje 				
+			
+			for( j = 0 ; j < mess_per_post ; ++j )
+			{
+				// Wait for server to finish the work
+                counting_sem_wait(msg_q[j]->op_completed);
+                
+                
+                // We can process and free the message
+                process_answer(msg_q[j]);
+                free_message(msg_q[j]);
+			}
+
+
 		// Sleep for period seconds before the next message
-		sleep(arg->period);
-		
+		sleep(arg->period);		
 	}
 	return NULL;
 }
+
 
 
 
@@ -107,7 +122,7 @@ void* client_thread (void* ptr) {
 // El hilo comenzara su ejecucion en la funcion client_thread
 // Es necesario pasar como argumento una variable de tipo struct client_arg
 // inicializada a partir de los argumentos de la funcion
-int create_client(sys_mbox_t* mbox, enum _message_types_ m_type, int n_messages, int period) {
+int create_client(sys_mbox_t* mbox, enum _message_types_ m_type, int total_messages , int messages_per_post , int period) {
 	
 	struct client_arg* argument;
 	pthread_t tmp;
@@ -125,10 +140,11 @@ int create_client(sys_mbox_t* mbox, enum _message_types_ m_type, int n_messages,
         return EXIT_FAILURE;
 
 	// INICIALIZA AQUI LOS CAMPOS DE argument
-    argument->mbox       = mbox;
-    argument->n_messages = n_messages;
-    argument->m_type     = m_type;
-    argument->period     = period;
+    argument->mbox              = mbox;
+    argument->n_messages        = total_messages;
+    argument->messages_per_post = messages_per_post;
+    argument->m_type            = m_type;
+    argument->period            = period;
         
 	
 	// CREACION DE HILO (CON COMPROBACION DE ERRORES)
@@ -143,3 +159,5 @@ int create_client(sys_mbox_t* mbox, enum _message_types_ m_type, int n_messages,
 	
 	return 0;	
 }
+
+void 

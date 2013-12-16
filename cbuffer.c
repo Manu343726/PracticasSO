@@ -45,6 +45,11 @@ int size_cbuffer_t ( cbuffer_t* cbuffer )
     return cbuffer->size ;
 }
 
+size_t free_size_cbuffer_t( cbuffer_t* cbuffer )
+{
+    return (size_t)(cbuffer->max_size - cbuffer->size);
+}
+
 /* Return a non-zero value when buffer is full */
 int is_full_cbuffer_t ( cbuffer_t* cbuffer )
 {
