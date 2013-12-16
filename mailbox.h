@@ -28,6 +28,7 @@ void  mbox_post( struct sys_mbox *mbox, void *msg);
 void* mbox_fetch(struct sys_mbox *mbox);
 
 void mbox_Multipost ( struct sys_mbox *mbox, void* msg_q[], int nmsg);
+void mbox_post ( struct sys_mbox *mbox, void* msg );
 
 #endif /* _MI_MBOX_ */
 

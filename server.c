@@ -32,7 +32,7 @@ int shutdown_server() {
 	}
 	
 	// Post it  message to mailbox
-	mbox_post( mbox, msg);
+	mbox_post( mbox, msg );
 
 	// Wait for server to finish the work
 	counting_sem_wait(msg->op_completed);

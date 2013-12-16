@@ -70,7 +70,7 @@ static void process_answer(message_t* msg) {
 // de resultado
 void* client_thread (void* ptr) {
 	struct client_arg* arg;
-	int i,j,k;
+	int i,j;
 	message_t* msg;
 	int mess_per_post=1;
 
@@ -78,7 +78,7 @@ void* client_thread (void* ptr) {
 	fprintf(logfile,"NEW client of type %d with period %d \n",arg->m_type, arg->period);
 	
 	// Asumo que el nuevo campo del tipo client_arg se llama mess_post
-	mess_per_post = arg->mess_post;
+	mess_per_post = arg->messages_per_post;
 	for (i=0;i<arg->n_messages; i+=mess_per_post) {
 			// ARRAY DE MENSAJES
 			void* msg_q[mess_per_post];
@@ -98,8 +98,10 @@ void* client_thread (void* ptr) {
 			
 			for( j = 0 ; j < mess_per_post ; ++j )
 			{
+				msg = msg_q[j];
+
 				// Wait for server to finish the work
-                counting_sem_wait(msg_q[j]->op_completed);
+                counting_sem_wait( msg->op_completed );
                 
                 
                 // We can process and free the message
@@ -159,5 +161,3 @@ int create_client(sys_mbox_t* mbox, enum _message_types_ m_type, int total_messa
 	
 	return 0;	
 }
-
-void 

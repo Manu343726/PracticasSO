@@ -96,6 +96,21 @@ mbox_Multipost( struct sys_mbox *mbox, void* msg[] , int nmsg )
     pthread_mutex_unlock( mbox->mutex );
 }
 
+void
+mbox_post( struct sys_mbox *mbox, void *msg)
+{
+    pthread_mutex_lock( mbox->mutex );
+
+    while( is_full_cbuffer_t( mbox->cbuffer ) )
+        var_cond_wait( mbox->hayHueco , mbox->mutex );
+    
+    insert_cbuffer_t( mbox->cbuffer , msg );
+
+    var_cond_signal( mbox->hayElem );
+
+    pthread_mutex_unlock( mbox->mutex );
+}
+
 
 /*-----------------------------------------------------------------------------------*/
 

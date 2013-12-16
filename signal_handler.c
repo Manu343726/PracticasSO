@@ -50,7 +50,7 @@ void SIGINT_handler(int signo) {
 
 void SIGUSR1_handler( int signal_number )
 {
-    create_client( gbl_mbox , default_client_type , nr_msgs , nr_secs );
+    create_client( gbl_mbox , default_client_type , nr_msgs , 1 , nr_secs );
     my_resume();
 }
 
