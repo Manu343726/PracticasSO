@@ -15,7 +15,7 @@ extern int nr_msgs;
 //Default client type
 extern enum _message_types_ default_client_type;
 // Creates a new thread executing a client wich will produce n_messages of type m_type every period seconds
-int create_client(sys_mbox_t* mbox, enum _message_types_ m_type, int n_messages, int period);
+int create_client(sys_mbox_t* mbox, enum _message_types_ m_type, int total_messages, int mess_per_post, int period);
 
 //int wait_for_clients();
 int get_nclients();

@@ -47,7 +47,7 @@ static void parse_commands_from_input(sys_mbox_t* mbox)
 	size_t len = 0;
 	int interactive=isatty(fileno(stdin));
 	unsigned char quit = 0;
-	int val[3];
+	int val[4];
 	pid_t pid=getpid();
 
 	printf("PID=%i\n",pid);
@@ -83,19 +83,19 @@ static void parse_commands_from_input(sys_mbox_t* mbox)
 			else if (strncmp(user_line,"client",6)==0)
 				{
 
-				tokens=sscanf(user_line, "client %i %i %i", &val[0], &val[1],&val[2]);
+				tokens=sscanf(user_line, "client %i %i %i %i", &val[0], &val[1],&val[2],&val[3]);
 				/*
-				 * Format: client <type> <messages> <seconds>
+				 * Format: client <type> <Totmessages> <messPerPost> <seconds>
 				 * */
-				if ((tokens==3) && (val[0] == 0 || val[0] == 1) && (val[1] > 0) && (val[2] > 0)) {
+				if ((tokens==4) && (val[0] == 0 || val[0] == 1) && (val[1] > 0) && (val[2] > 0) &&  (val[1]>= val[2]) && (val[3] > 0) ) {
 
-					if (create_client(mbox, val[0], val[1], val[2]) != 0) {
+					if (create_client(mbox, val[0], val[1], val[2], val[3]) != 0) {
 						fprintf(stderr, "Error when creating client \n");
 						exit(1);
 					}
 				} else {
 					fprintf(stderr,
-							"Wrong format. Usage: client <type> <messages> <seconds>\n");
+							"Wrong format. Usage: client <type> <Totalmess> <messPerPost> <seconds>\n");
 				}
 			} else if (sscanf(user_line, "nr_secs=%i", &val[0]) == 1)
 
